@@ -9,8 +9,12 @@
 #include <stdio.h>
 #include <time.h>
 
-#define n_miast 2000
-#define n_matrix 5
+/*
+Kompilowanie: g++ TSP_par.cpp
+*/
+
+#define n_miast 1000
+#define n_matrix 10
 
 using namespace std;
 
@@ -85,10 +89,31 @@ int main() {
     
     double timeStart = clock();
     for(int i = 0; i<n_matrix; i++){
-        algorytm(miasta[i], 500);
+        algorytm(miasta[i], 200);
     }
     double timeEnd = clock();
-    cout<<"500 Time: " << (timeEnd - timeStart)/CLOCKS_PER_SEC/n_matrix<< " seconds"<<endl;
+    cout<<"200 Time: " << (timeEnd - timeStart)/CLOCKS_PER_SEC/n_matrix<< " seconds"<<endl;
+
+    timeStart = clock();
+    for(int i = 0; i<n_matrix; i++){
+        algorytm(miasta[i], 400);
+    }
+    timeEnd = clock();
+    cout<<"400 Time: " << (timeEnd - timeStart)/CLOCKS_PER_SEC/n_matrix<< " seconds"<<endl;
+
+    timeStart = clock();
+    for(int i = 0; i<n_matrix; i++){
+        algorytm(miasta[i], 600);
+    }
+    timeEnd = clock();
+    cout<<"600 Time: " << (timeEnd - timeStart)/CLOCKS_PER_SEC/n_matrix<< " seconds"<<endl;
+
+    timeStart = clock();
+    for(int i = 0; i<n_matrix; i++){
+        algorytm(miasta[i], 800);
+    }
+    timeEnd = clock();
+    cout<<"800 Time: " << (timeEnd - timeStart)/CLOCKS_PER_SEC/n_matrix<< " seconds"<<endl;
 
     timeStart = clock();
     for(int i = 0; i<n_matrix; i++){
@@ -96,20 +121,6 @@ int main() {
     }
     timeEnd = clock();
     cout<<"1000 Time: " << (timeEnd - timeStart)/CLOCKS_PER_SEC/n_matrix<< " seconds"<<endl;
-
-    timeStart = clock();
-    for(int i = 0; i<n_matrix; i++){
-        algorytm(miasta[i], 1500);
-    }
-    timeEnd = clock();
-    cout<<"1500 Time: " << (timeEnd - timeStart)/CLOCKS_PER_SEC/n_matrix<< " seconds"<<endl;
-
-    timeStart = clock();
-    for(int i = 0; i<n_matrix; i++){
-        algorytm(miasta[i], 2000);
-    }
-    timeEnd = clock();
-    cout<<"2000 Time: " << (timeEnd - timeStart)/CLOCKS_PER_SEC/n_matrix<< " seconds"<<endl;
 
 
     for (int i = 0; i< n_matrix; i++) {
