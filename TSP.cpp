@@ -9,16 +9,58 @@
 #include <stdio.h>
 #include <time.h>
 
-/*
-Kompilowanie: g++ -fopenmp TSP_par.cpp
-*/
-
-#define n_miast 1000
-#define n_matrix 10
-
 using namespace std;
 
-void algorytm(int **miasta, int nMiast){
+// compilowanie# g++ -fopenmp TSP.cpp
+// Przykładowe uruchomienie# ./a.out 100
+
+void algorytmSeq(int **miasta, int nMiast){
+    int bestTime = -1;
+
+
+    {
+
+        for(int i = 0; i < nMiast; i++){
+            
+            int sum = 0;
+
+            int odwiedzony[nMiast] = {0};
+            odwiedzony[i] = 1;
+            int actual = i;
+            int kolejnosc[nMiast+1];
+            kolejnosc[0]=actual;
+
+            for(int n = 0; n < nMiast-1; n++){
+
+                int min = miasta[actual][actual];
+                int best = actual;
+
+                for(int j = 0; j < nMiast; j++){
+                    if(odwiedzony[j] == 0 && min > miasta[actual][j]){
+                        best = j;
+                        min = miasta[actual][j];
+                    }
+                }
+
+                sum = sum + min;
+                if( (sum > bestTime && bestTime != -1)){
+                    break;
+                }
+                odwiedzony[best] = 1;
+                actual = best;
+                kolejnosc[n+1] = actual;
+            }
+            sum = sum + miasta[actual][i];
+            
+            if(bestTime == -1 || bestTime > sum){
+                bestTime = sum;
+            }
+        }
+    }
+    cout <<"Cykl Hamiltona sekwencyjnie: " << bestTime << endl;
+}
+
+void algorytmPar(int **miasta, int nMiast){
     int bestTime;
     int globalBestTime;
 
@@ -52,6 +94,9 @@ void algorytm(int **miasta, int nMiast){
                 }
                 
                 sum = sum + min;
+                if( (sum > bestTime && bestTime != -1) || (sum > globalBestTime && globalBestTime != -1)){
+                    break;
+                }
                 odwiedzony[best] = 1;
                 actual = best;
                 kolejnosc[n+1] = actual;
@@ -67,12 +112,15 @@ void algorytm(int **miasta, int nMiast){
             globalBestTime = bestTime;
         }
     }
+    cout <<"Cykl Hamiltona równolegle: " << globalBestTime << endl;
 }
 
-int main() {
+int main(int argc, char *argv[]){
 
-    int *** miasta = (int ***)malloc(n_matrix*sizeof(int**));
-    for (int i = 0; i< n_matrix; i++) {
+    int n_miast = atoi(argv[1]);
+
+    int *** miasta = (int ***)malloc(1*sizeof(int**));
+    for (int i = 0; i< 1; i++) {
         miasta[i] = (int **) malloc(n_miast*sizeof(int *));
         for (int j = 0; j < n_miast; j++) {
             miasta[i][j] = (int *)malloc(n_miast*sizeof(int));
@@ -81,7 +129,7 @@ int main() {
     }
 
     srand(time(0));
-    for(int m = 0; m<n_matrix; m++){
+    for(int m = 0; m<1; m++){
         for(int i = 0; i < n_miast; i++){
             for(int j = 0; j < n_miast; j++){
                 if(i==j){
@@ -95,52 +143,23 @@ int main() {
         }
     }
 
-    
-    double timeStart = omp_get_wtime();
-    for(int i = 0; i<n_matrix; i++){
-        algorytm(miasta[i], 200);
-    }
-    double timeEnd = omp_get_wtime();
-    cout<<"200 Time: " << (timeEnd - timeStart)/n_matrix<< " seconds"<<endl;
+    double timeStart = clock();
+    algorytmSeq(miasta[0], n_miast);
+    double timeEnd = clock();
+    cout<<"Time: " << (timeEnd - timeStart)/CLOCKS_PER_SEC << " seconds"<<endl;
 
     timeStart = omp_get_wtime();
-    for(int i = 0; i<n_matrix; i++){
-        algorytm(miasta[i], 400);
-    }
+    algorytmPar(miasta[0], n_miast);
     timeEnd = omp_get_wtime();
-    cout<<"400 Time: " << (timeEnd - timeStart)/n_matrix<< " seconds"<<endl;
-
-    timeStart = omp_get_wtime();
-    for(int i = 0; i<n_matrix; i++){
-        algorytm(miasta[i], 600);
-    }
-    timeEnd = omp_get_wtime();
-    cout<<"600 Time: " << (timeEnd - timeStart)/n_matrix<< " seconds"<<endl;
-
-    timeStart = omp_get_wtime();;
-    for(int i = 0; i<n_matrix; i++){
-        algorytm(miasta[i], 800);
-    }
-    timeEnd = omp_get_wtime();
-    cout<<"800 Time: " << (timeEnd - timeStart)/n_matrix<< " seconds"<<endl;
-
-    timeStart = omp_get_wtime();
-    for(int i = 0; i<n_matrix; i++){
-        algorytm(miasta[i], 1000);
-    }
-    timeEnd = omp_get_wtime();
-    cout<<"1000 Time: " << (timeEnd - timeStart)/n_matrix<< " seconds"<<endl;
+    cout<<"Time: " << (timeEnd - timeStart) << " seconds"<<endl;
 
 
-    for (int i = 0; i< n_matrix; i++) {
+    for (int i = 0; i< 1; i++) {
         for (int j = 0; j < n_miast; j++) {
             free(miasta[i][j]);
         }
         free(miasta[i]);
     }
     free(miasta);
-    
-   return 0;
-   
-   
+    return 0;
 }
